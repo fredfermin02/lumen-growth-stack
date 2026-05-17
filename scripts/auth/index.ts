@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 const STORE = process.env.SHOPIFY_STORE;
 const CLIENT_ID = process.env.SHOPIFY_APP_CLIENT_ID;
 const CLIENT_SECRET = process.env.SHOPIFY_APP_CLIENT_SECRET;
-const REDIRECT_PORT = 3000;
+const REDIRECT_PORT = Number(process.env.SHOPIFY_AUTH_PORT ?? 53737);
 const REDIRECT_PATH = "/auth/callback";
 const REDIRECT_URI = `http://localhost:${REDIRECT_PORT}${REDIRECT_PATH}`;
 
