@@ -1,0 +1,20 @@
+{
+  "name": "lumen-seed",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "tsx seed/index.ts",
+    "seed:metafields": "tsx seed/metafields.ts",
+    "seed:metaobjects": "tsx seed/metaobjects.ts",
+    "seed:products": "tsx seed/products.ts",
+    "seed:collections": "tsx seed/collections.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.8.0"
+  }
+}
