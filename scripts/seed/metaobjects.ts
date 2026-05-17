@@ -26,6 +26,14 @@ const DEFINITIONS: MetaobjectDef[] = [
       { key: "rating", name: "Rating", type: "number_integer" },
       { key: "product", name: "Product", type: "product_reference" },
       { key: "photo", name: "Photo", type: "file_reference" },
+      {
+        key: "category",
+        name: "Category",
+        type: "single_line_text_field",
+        validations: [
+          { name: "choices", value: JSON.stringify(["athletes", "wellness", "festival"]) },
+        ],
+      },
     ],
   },
   {
@@ -69,6 +77,22 @@ mutation CreateMetaobjectDef($definition: MetaobjectDefinitionCreateInput!) {
   }
 }`;
 
+const LOOKUP_BY_TYPE = `
+query DefByType($type: String!) {
+  metaobjectDefinitionByType(type: $type) {
+    id
+    fieldDefinitions { key }
+  }
+}`;
+
+const UPDATE = `
+mutation UpdateMetaobjectDef($id: ID!, $definition: MetaobjectDefinitionUpdateInput!) {
+  metaobjectDefinitionUpdate(id: $id, definition: $definition) {
+    metaobjectDefinition { id type fieldDefinitions { key } }
+    userErrors { field message code }
+  }
+}`;
+
 export async function seedMetaobjectDefinitions() {
   console.log("→ Creating metaobject definitions");
   for (const def of DEFINITIONS) {
@@ -99,6 +123,54 @@ export async function seedMetaobjectDefinitions() {
       console.log(`  ✓ ${def.type} (${metaobjectDefinition.id})`);
     } else {
       logUserErrors(def.type, userErrors);
+    }
+  }
+
+  console.log("→ Ensuring all defined fields exist on each metaobject");
+  for (const def of DEFINITIONS) {
+    const lookup = await gql<{
+      metaobjectDefinitionByType: {
+        id: string;
+        fieldDefinitions: Array<{ key: string }>;
+      } | null;
+    }>(LOOKUP_BY_TYPE, { type: def.type });
+
+    const existing = lookup.metaobjectDefinitionByType;
+    if (!existing) {
+      console.log(`  ✗ ${def.type}: not found, skipping field-update check`);
+      continue;
+    }
+
+    const existingKeys = new Set(existing.fieldDefinitions.map((f) => f.key));
+    const missing = def.fieldDefinitions.filter((f) => !existingKeys.has(f.key));
+    if (missing.length === 0) {
+      continue;
+    }
+
+    const res = await gql<{
+      metaobjectDefinitionUpdate: {
+        metaobjectDefinition: { fieldDefinitions: Array<{ key: string }> } | null;
+        userErrors: UserError[];
+      };
+    }>(UPDATE, {
+      id: existing.id,
+      definition: {
+        fieldDefinitions: missing.map((f) => ({
+          create: {
+            key: f.key,
+            name: f.name,
+            type: f.type,
+            required: f.required ?? false,
+            validations: f.validations,
+          },
+        })),
+      },
+    });
+
+    if (res.metaobjectDefinitionUpdate.metaobjectDefinition) {
+      console.log(`  ✓ ${def.type}: added ${missing.map((f) => f.key).join(", ")}`);
+    } else {
+      logUserErrors(`${def.type} field update`, res.metaobjectDefinitionUpdate.userErrors);
     }
   }
 }

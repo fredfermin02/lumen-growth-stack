@@ -9,6 +9,7 @@
     "seed:metaobjects": "tsx seed/metaobjects.ts",
     "seed:products": "tsx seed/products.ts",
     "seed:inventory": "tsx seed/inventory.ts",
+    "seed:content": "tsx seed/content.ts",
     "seed:collections": "tsx seed/collections.ts",
     "seed:publish": "tsx seed/publish.ts",
     "verify": "tsx seed/verify.ts",
