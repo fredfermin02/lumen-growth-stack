@@ -1,0 +1,333 @@
+{%- liquid
+  assign s = section.settings
+  assign has_stats = false
+  if s.stat_1_number != blank or s.stat_2_number != blank or s.stat_3_number != blank
+    assign has_stats = true
+  endif
+-%}
+
+<div class="section section--{{ s.section_width }} lumen-mission lumen-mission--media-{{ s.media_position }} color-{{ s.color_scheme }} spacing-style" style="{% render 'spacing-style', settings: s %}">
+  <div class="lumen-mission__media">
+    {%- if s.image -%}
+      {{
+        s.image
+        | image_url: width: 1400
+        | image_tag:
+          loading: 'lazy',
+          sizes: '(min-width: 750px) 50vw, 100vw',
+          widths: '480, 800, 1200, 1400',
+          alt: s.image.alt | default: s.headline,
+          class: 'lumen-mission__image'
+      }}
+    {%- else -%}
+      <div class="lumen-mission__image lumen-mission__image--placeholder">
+        {{- 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' -}}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="lumen-mission__content">
+    {%- if s.eyebrow != blank -%}
+      <p class="lumen-mission__eyebrow">{{ s.eyebrow }}</p>
+    {%- endif -%}
+
+    {%- if s.headline != blank -%}
+      <h2 class="lumen-mission__headline">{{ s.headline }}</h2>
+    {%- endif -%}
+
+    {%- if s.body != blank -%}
+      <div class="lumen-mission__body rte">{{ s.body }}</div>
+    {%- endif -%}
+
+    {%- if has_stats -%}
+      <div class="lumen-mission__stats">
+        {%- if s.stat_1_number != blank -%}
+          <div class="lumen-mission__stat">
+            <span class="lumen-mission__stat-number">{{ s.stat_1_number }}</span>
+            <span class="lumen-mission__stat-label">{{ s.stat_1_label }}</span>
+          </div>
+        {%- endif -%}
+        {%- if s.stat_2_number != blank -%}
+          <div class="lumen-mission__stat">
+            <span class="lumen-mission__stat-number">{{ s.stat_2_number }}</span>
+            <span class="lumen-mission__stat-label">{{ s.stat_2_label }}</span>
+          </div>
+        {%- endif -%}
+        {%- if s.stat_3_number != blank -%}
+          <div class="lumen-mission__stat">
+            <span class="lumen-mission__stat-number">{{ s.stat_3_number }}</span>
+            <span class="lumen-mission__stat-label">{{ s.stat_3_label }}</span>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if s.cta_label != blank and s.cta_link != blank -%}
+      <a href="{{ s.cta_link }}" class="button button-primary lumen-mission__cta">{{ s.cta_label }}</a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .lumen-mission {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: 'media' 'content';
+  }
+
+  .lumen-mission__media {
+    grid-area: media;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--color-border);
+  }
+
+  .lumen-mission__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .lumen-mission__image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lumen-mission__content {
+    grid-area: content;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .lumen-mission__eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  .lumen-mission__headline {
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.15;
+    margin: 0;
+    color: var(--color-foreground-heading);
+    max-width: 24ch;
+  }
+
+  .lumen-mission__body {
+    color: var(--color-foreground);
+    line-height: 1.6;
+    max-width: 40ch;
+  }
+
+  .lumen-mission__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .lumen-mission__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .lumen-mission__stat-number {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+
+  .lumen-mission__stat-label {
+    font-size: 0.875rem;
+    color: var(--color-foreground);
+    opacity: 0.8;
+    line-height: 1.3;
+  }
+
+  .lumen-mission__cta {
+    align-self: flex-start;
+  }
+
+  @media (min-width: 750px) {
+    .lumen-mission {
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas: 'media content';
+      align-items: center;
+    }
+
+    .lumen-mission--media-right {
+      grid-template-areas: 'content media';
+    }
+
+    .lumen-mission__content {
+      padding: 4rem 3rem;
+    }
+
+    .lumen-mission__media {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lumen mission",
+  "class": "lumen-section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Why we exist"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Wellness without the marketing sprinkle"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body",
+      "default": "<p>We started Lumen because functional beverages had become marketing performances. Clinical-grade doses, transparent sourcing, real ingredients you can pronounce.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Stats (optional, up to 3)"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_number",
+      "label": "Stat 1 number"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_label",
+      "label": "Stat 1 label"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_number",
+      "label": "Stat 2 number"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_label",
+      "label": "Stat 2 label"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_number",
+      "label": "Stat 3 number"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_label",
+      "label": "Stat 3 label"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Image position (desktop)",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page width" },
+        { "value": "full-width", "label": "Full width" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lumen mission",
+      "category": "Lumen",
+      "settings": {
+        "eyebrow": "Why we exist",
+        "headline": "Wellness without the marketing sprinkle",
+        "stat_1_number": "70%",
+        "stat_1_label": "post-consumer recycled aluminum",
+        "stat_2_number": "1%",
+        "stat_2_label": "of every sale to the planet",
+        "stat_3_number": "ISO 17025",
+        "stat_3_label": "lab-tested every batch"
+      }
+    }
+  ]
+}
+{% endschema %}

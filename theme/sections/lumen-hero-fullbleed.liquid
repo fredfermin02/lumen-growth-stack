@@ -1,0 +1,335 @@
+{%- liquid
+  assign s = section.settings
+  assign has_swap_data = false
+  if s.swap_athletes_headline != blank or s.swap_wellness_headline != blank or s.swap_festival_headline != blank
+    assign has_swap_data = true
+  endif
+-%}
+
+<div
+  class="section lumen-hero-fullbleed color-{{ s.color_scheme }} spacing-style"
+  data-section-id="{{ section.id }}"
+  {% if s.audience_tag != blank %}data-audience-tag="{{ s.audience_tag }}"{% endif %}
+  style="
+    --hero-height: {{ s.height }};
+    --overlay-opacity: {{ s.overlay_opacity | divided_by: 100.0 }};
+    {%- render 'spacing-style', settings: s -%}
+  "
+>
+  <div class="lumen-hero-fullbleed__media" data-utm-image-container>
+    {%- if s.image -%}
+      {{
+        s.image
+        | image_url: width: 2400
+        | image_tag:
+          loading: 'eager',
+          fetchpriority: 'high',
+          sizes: '100vw',
+          widths: '800, 1200, 1800, 2400',
+          alt: s.image.alt | default: s.headline,
+          class: 'lumen-hero-fullbleed__image',
+          data-utm-image: ''
+      }}
+    {%- else -%}
+      <div class="lumen-hero-fullbleed__image lumen-hero-fullbleed__image--placeholder" data-utm-image>
+        {{- 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' -}}
+      </div>
+    {%- endif -%}
+    <div class="lumen-hero-fullbleed__overlay" aria-hidden="true"></div>
+  </div>
+
+  <div class="lumen-hero-fullbleed__content lumen-hero-fullbleed__content--align-{{ s.text_alignment }}">
+    {%- if s.eyebrow != blank -%}
+      <p class="lumen-hero-fullbleed__eyebrow">{{ s.eyebrow }}</p>
+    {%- endif -%}
+
+    <h1 class="lumen-hero-fullbleed__headline" data-utm-headline>{{ s.headline }}</h1>
+
+    {%- if s.subhead != blank -%}
+      <p class="lumen-hero-fullbleed__subhead">{{ s.subhead }}</p>
+    {%- endif -%}
+
+    {%- if s.cta_label != blank and s.cta_link != blank -%}
+      <a href="{{ s.cta_link }}" class="button button-primary lumen-hero-fullbleed__cta">{{ s.cta_label }}</a>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- if has_swap_data -%}
+  <script type="application/json" data-lumen-utm-swap="{{ section.id }}">
+    {
+      "athletes": {
+        "headline": {{ s.swap_athletes_headline | json }},
+        "image": {{ s.swap_athletes_image | image_url: width: 2400 | json }}
+      },
+      "wellness": {
+        "headline": {{ s.swap_wellness_headline | json }},
+        "image": {{ s.swap_wellness_image | image_url: width: 2400 | json }}
+      },
+      "festival": {
+        "headline": {{ s.swap_festival_headline | json }},
+        "image": {{ s.swap_festival_image | image_url: width: 2400 | json }}
+      }
+    }
+  </script>
+  <script src="{{ 'lumen-utm-swap.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% stylesheet %}
+  .lumen-hero-fullbleed {
+    position: relative;
+    min-height: var(--hero-height, 80svh);
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    overflow: hidden;
+    color: #fff;
+  }
+
+  .lumen-hero-fullbleed__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .lumen-hero-fullbleed__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .lumen-hero-fullbleed__image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-border);
+  }
+
+  .lumen-hero-fullbleed__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, var(--overlay-opacity, 0.35));
+  }
+
+  .lumen-hero-fullbleed__content {
+    position: relative;
+    z-index: 1;
+    padding: 3rem 1.5rem;
+    max-width: 48rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .lumen-hero-fullbleed__content--align-left { text-align: left; align-items: flex-start; }
+  .lumen-hero-fullbleed__content--align-center { text-align: center; align-items: center; }
+  .lumen-hero-fullbleed__content--align-right { text-align: right; align-items: flex-end; }
+
+  .lumen-hero-fullbleed__eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  .lumen-hero-fullbleed__headline {
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    line-height: 1.0;
+    margin: 0;
+    color: inherit;
+  }
+
+  .lumen-hero-fullbleed__subhead {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    margin: 0;
+    opacity: 0.95;
+    max-width: 40ch;
+  }
+
+  .lumen-hero-fullbleed__cta {
+    margin-top: 0.5rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lumen hero (fullbleed)",
+  "class": "lumen-section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Drink the difference"
+    },
+    {
+      "type": "textarea",
+      "id": "subhead",
+      "label": "Subhead",
+      "default": "Functional beverages built around real adaptogens — not marketing sprinkles."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Shop the line"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "options": [
+        { "value": "60svh", "label": "Medium" },
+        { "value": "80svh", "label": "Large" },
+        { "value": "100svh", "label": "Full screen" }
+      ],
+      "default": "80svh"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "header",
+      "content": "UTM swap (optional)",
+      "info": "Set an audience_tag to enable URL-param-driven content swap. Customers visiting ?audience=athletes will see the 'athletes' variant."
+    },
+    {
+      "type": "text",
+      "id": "audience_tag",
+      "label": "Audience tag (label only)"
+    },
+    {
+      "type": "header",
+      "content": "Swap — Athletes (?audience=athletes)"
+    },
+    {
+      "type": "text",
+      "id": "swap_athletes_headline",
+      "label": "Headline"
+    },
+    {
+      "type": "image_picker",
+      "id": "swap_athletes_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Swap — Wellness (?audience=wellness)"
+    },
+    {
+      "type": "text",
+      "id": "swap_wellness_headline",
+      "label": "Headline"
+    },
+    {
+      "type": "image_picker",
+      "id": "swap_wellness_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Swap — Festival (?audience=festival)"
+    },
+    {
+      "type": "text",
+      "id": "swap_festival_headline",
+      "label": "Headline"
+    },
+    {
+      "type": "image_picker",
+      "id": "swap_festival_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lumen hero (fullbleed)",
+      "category": "Lumen",
+      "settings": {
+        "headline": "Drink the difference",
+        "subhead": "Functional beverages built around real adaptogens.",
+        "cta_label": "Shop the line",
+        "cta_link": "shopify://collections/all",
+        "height": "80svh",
+        "color_scheme": "scheme-2"
+      }
+    }
+  ]
+}
+{% endschema %}

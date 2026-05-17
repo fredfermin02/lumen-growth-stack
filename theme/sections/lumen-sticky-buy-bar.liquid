@@ -1,0 +1,140 @@
+{%- liquid
+  assign s = section.settings
+-%}
+
+<lumen-sticky-bar
+  class="lumen-sticky-bar color-{{ s.color_scheme }}"
+  data-show-after="{{ s.show_after_scroll_px }}"
+  hidden
+>
+  <div class="lumen-sticky-bar__inner">
+    {%- if s.headline != blank -%}
+      <span class="lumen-sticky-bar__copy">{{ s.headline }}</span>
+    {%- endif -%}
+
+    <a href="{{ s.cta_link }}" class="button button-primary lumen-sticky-bar__cta">{{ s.cta_label }}</a>
+
+    <button
+      type="button"
+      class="lumen-sticky-bar__dismiss"
+      aria-label="Dismiss"
+      data-lumen-sticky-dismiss
+    >&times;</button>
+  </div>
+</lumen-sticky-bar>
+
+<script src="{{ 'lumen-sticky-buy-bar.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  lumen-sticky-bar {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 50;
+    background: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    display: block;
+  }
+
+  lumen-sticky-bar[data-visible='true'] {
+    transform: translateY(0);
+  }
+
+  .lumen-sticky-bar__inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .lumen-sticky-bar__copy {
+    flex: 1;
+    font-size: 0.9375rem;
+    color: var(--color-foreground-heading);
+    font-weight: 500;
+    display: none;
+  }
+
+  @media (min-width: 600px) {
+    .lumen-sticky-bar__copy {
+      display: block;
+    }
+  }
+
+  .lumen-sticky-bar__cta {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .lumen-sticky-bar__dismiss {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-foreground);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    opacity: 0.5;
+  }
+
+  .lumen-sticky-bar__dismiss:hover {
+    opacity: 1;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lumen sticky buy bar",
+  "class": "lumen-section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Drink the difference"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "range",
+      "id": "show_after_scroll_px",
+      "label": "Show after scrolling (px)",
+      "min": 200,
+      "max": 2000,
+      "step": 100,
+      "default": 600
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lumen sticky buy bar",
+      "category": "Lumen",
+      "settings": {
+        "headline": "Drink the difference",
+        "cta_label": "Shop now",
+        "cta_link": "shopify://collections/all"
+      }
+    }
+  ]
+}
+{% endschema %}

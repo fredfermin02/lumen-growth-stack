@@ -1,0 +1,342 @@
+{%- liquid
+  assign s = section.settings
+  assign media_modifier = 'media-position-' | append: s.media_position
+  assign has_swap_data = false
+  if s.swap_athletes_headline != blank or s.swap_wellness_headline != blank or s.swap_festival_headline != blank
+    assign has_swap_data = true
+  endif
+-%}
+
+<div class="section-background color-{{ s.color_scheme }}"></div>
+<div
+  class="section section--{{ s.section_width }} lumen-hero-split lumen-hero-split--{{ media_modifier }} color-{{ s.color_scheme }} spacing-style"
+  data-section-id="{{ section.id }}"
+  {% if s.audience_tag != blank %}data-audience-tag="{{ s.audience_tag }}"{% endif %}
+  style="
+    {%- render 'spacing-style', settings: s -%}
+  "
+>
+  <div class="lumen-hero-split__media" data-utm-image-container>
+    {%- if s.image -%}
+      {{
+        s.image
+        | image_url: width: 1600
+        | image_tag:
+          loading: 'eager',
+          fetchpriority: 'high',
+          sizes: '(min-width: 750px) 50vw, 100vw',
+          widths: '480, 800, 1200, 1600',
+          alt: s.image.alt | default: s.headline,
+          class: 'lumen-hero-split__image',
+          data-utm-image: ''
+      }}
+    {%- else -%}
+      <div class="lumen-hero-split__image lumen-hero-split__image--placeholder" data-utm-image>
+        {{- 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' -}}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="lumen-hero-split__content">
+    {%- if s.eyebrow != blank -%}
+      <p class="lumen-hero-split__eyebrow">{{ s.eyebrow }}</p>
+    {%- endif -%}
+
+    <h1 class="lumen-hero-split__headline" data-utm-headline>{{ s.headline }}</h1>
+
+    {%- if s.subhead != blank -%}
+      <p class="lumen-hero-split__subhead">{{ s.subhead }}</p>
+    {%- endif -%}
+
+    {%- if s.cta_label != blank and s.cta_link != blank -%}
+      <a href="{{ s.cta_link }}" class="button button-primary lumen-hero-split__cta">{{ s.cta_label }}</a>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- if has_swap_data -%}
+  <script type="application/json" data-lumen-utm-swap="{{ section.id }}">
+    {
+      "athletes": {
+        "headline": {{ s.swap_athletes_headline | json }},
+        "image": {{ s.swap_athletes_image | image_url: width: 1600 | json }}
+      },
+      "wellness": {
+        "headline": {{ s.swap_wellness_headline | json }},
+        "image": {{ s.swap_wellness_image | image_url: width: 1600 | json }}
+      },
+      "festival": {
+        "headline": {{ s.swap_festival_headline | json }},
+        "image": {{ s.swap_festival_image | image_url: width: 1600 | json }}
+      }
+    }
+  </script>
+  <script src="{{ 'lumen-utm-swap.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% stylesheet %}
+  .lumen-hero-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: 'media' 'content';
+    gap: 0;
+  }
+
+  .lumen-hero-split__media {
+    grid-area: media;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--color-border);
+  }
+
+  .lumen-hero-split__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .lumen-hero-split__image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lumen-hero-split__image--placeholder svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .lumen-hero-split__content {
+    grid-area: content;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.25rem;
+    max-width: 32rem;
+  }
+
+  .lumen-hero-split__eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  .lumen-hero-split__headline {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.05;
+    margin: 0;
+    color: var(--color-foreground-heading);
+  }
+
+  .lumen-hero-split__subhead {
+    font-size: 1.125rem;
+    line-height: 1.55;
+    color: var(--color-foreground);
+    margin: 0;
+    max-width: 40ch;
+  }
+
+  .lumen-hero-split__cta {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  @media (min-width: 750px) {
+    .lumen-hero-split {
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas: 'media content';
+      min-height: 70svh;
+    }
+
+    .lumen-hero-split--media-position-right {
+      grid-template-areas: 'content media';
+    }
+
+    .lumen-hero-split__media {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+
+    .lumen-hero-split__content {
+      padding: 4rem 3rem;
+      max-width: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lumen hero (split)",
+  "class": "lumen-section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "New from Lumen"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Show up sharp"
+    },
+    {
+      "type": "textarea",
+      "id": "subhead",
+      "label": "Subhead",
+      "default": "Adaptogenic beverages that actually do the work. No marketing sprinkles, no synthetic stimulants."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Shop the line"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Image position (desktop)",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page width" },
+        { "value": "full-width", "label": "Full width" }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "UTM swap (optional)",
+      "info": "Set an audience_tag to enable URL-param-driven content swap. Customers visiting ?audience=athletes will see the 'athletes' variant."
+    },
+    {
+      "type": "text",
+      "id": "audience_tag",
+      "label": "Audience tag (label only)",
+      "info": "e.g. 'athletes', 'wellness', 'festival' — used by data layer for analytics"
+    },
+    {
+      "type": "header",
+      "content": "Swap — Athletes (?audience=athletes)"
+    },
+    {
+      "type": "text",
+      "id": "swap_athletes_headline",
+      "label": "Headline"
+    },
+    {
+      "type": "image_picker",
+      "id": "swap_athletes_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Swap — Wellness (?audience=wellness)"
+    },
+    {
+      "type": "text",
+      "id": "swap_wellness_headline",
+      "label": "Headline"
+    },
+    {
+      "type": "image_picker",
+      "id": "swap_wellness_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Swap — Festival (?audience=festival)"
+    },
+    {
+      "type": "text",
+      "id": "swap_festival_headline",
+      "label": "Headline"
+    },
+    {
+      "type": "image_picker",
+      "id": "swap_festival_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lumen hero (split)",
+      "category": "Lumen",
+      "settings": {
+        "eyebrow": "New from Lumen",
+        "headline": "Show up sharp",
+        "subhead": "Adaptogenic beverages that actually do the work.",
+        "cta_label": "Shop the line",
+        "cta_link": "shopify://collections/all",
+        "media_position": "left",
+        "section_width": "full-width",
+        "color_scheme": "scheme-1"
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,218 @@
+{%- liquid
+  assign s = section.settings
+  assign items = s.items.value | default: s.items
+-%}
+
+<div class="section color-{{ s.color_scheme }} spacing-style lumen-faq" style="{% render 'spacing-style', settings: s %}">
+  <div class="lumen-faq__inner">
+    {%- if s.heading != blank -%}
+      <h2 class="lumen-faq__heading">{{ s.heading }}</h2>
+    {%- endif -%}
+
+    {%- if s.intro != blank -%}
+      <div class="lumen-faq__intro rte">{{ s.intro }}</div>
+    {%- endif -%}
+
+    <div class="lumen-faq__list">
+      {%- if items.size > 0 -%}
+        {%- for item in items -%}
+          {%- liquid
+            if s.category_filter != blank and item.category != s.category_filter
+              continue
+            endif
+          -%}
+          <accordion-custom class="lumen-faq__item">
+            <details class="lumen-faq__details">
+              <summary class="lumen-faq__summary">
+                <span class="lumen-faq__question">{{ item.question }}</span>
+                <span class="lumen-faq__icon" aria-hidden="true">
+                  {{- 'icon-plus.svg' | inline_asset_content -}}
+                </span>
+              </summary>
+              <div class="lumen-faq__answer rte">{{ item.answer | newline_to_br }}</div>
+            </details>
+          </accordion-custom>
+        {%- endfor -%}
+      {%- else -%}
+        <p class="lumen-faq__empty">No FAQ items selected. Edit this section to add FAQ items from the Metaobjects library.</p>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'accordion-custom.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .lumen-faq__inner {
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+  }
+
+  .lumen-faq__heading {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    margin: 0 0 0.75rem;
+    color: var(--color-foreground-heading);
+  }
+
+  .lumen-faq__intro {
+    color: var(--color-foreground);
+    opacity: 0.8;
+    margin-bottom: 2rem;
+    max-width: 38rem;
+  }
+
+  .lumen-faq__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .lumen-faq__item {
+    display: block;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .lumen-faq__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .lumen-faq__details {
+    width: 100%;
+  }
+
+  .lumen-faq__summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1.25rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-foreground-heading);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    line-height: 1.4;
+  }
+
+  .lumen-faq__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .lumen-faq__question {
+    flex: 1;
+  }
+
+  .lumen-faq__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    color: var(--color-primary);
+  }
+
+  .lumen-faq__icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  details[open] .lumen-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .lumen-faq__answer {
+    padding: 0 0 1.5rem;
+    color: var(--color-foreground);
+    line-height: 1.6;
+    max-width: 48rem;
+  }
+
+  .lumen-faq__empty {
+    padding: 2rem 0;
+    color: var(--color-foreground);
+    opacity: 0.6;
+    font-style: italic;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lumen FAQ",
+  "class": "lumen-section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Frequently asked"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro"
+    },
+    {
+      "type": "metaobject_list",
+      "id": "items",
+      "label": "FAQ items",
+      "info": "Pick FAQ items from the Metaobjects library (Settings → Custom data → Metaobjects → FAQ item).",
+      "metaobject_type": "faq_item"
+    },
+    {
+      "type": "text",
+      "id": "category_filter",
+      "label": "Category filter (optional)",
+      "info": "If set, only items matching this category are shown. E.g. 'Ingredients', 'Shipping', 'Subscription'."
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lumen FAQ",
+      "category": "Lumen",
+      "settings": {
+        "heading": "Frequently asked",
+        "color_scheme": "scheme-1"
+      }
+    }
+  ]
+}
+{% endschema %}
