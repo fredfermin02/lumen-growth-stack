@@ -1,6 +1,7 @@
 import { seedMetafieldDefinitions } from "./metafields.ts";
 import { seedMetaobjectDefinitions } from "./metaobjects.ts";
 import { seedProducts } from "./products.ts";
+import { seedInventory } from "./inventory.ts";
 import { seedCollections } from "./collections.ts";
 
 async function main() {
@@ -10,6 +11,8 @@ async function main() {
   await seedMetaobjectDefinitions();
   console.log();
   await seedProducts();
+  console.log();
+  await seedInventory();
   console.log();
   await seedCollections();
   console.log("\n=== Done ===");

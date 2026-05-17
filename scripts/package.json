@@ -8,7 +8,10 @@
     "seed:metafields": "tsx seed/metafields.ts",
     "seed:metaobjects": "tsx seed/metaobjects.ts",
     "seed:products": "tsx seed/products.ts",
-    "seed:collections": "tsx seed/collections.ts"
+    "seed:inventory": "tsx seed/inventory.ts",
+    "seed:collections": "tsx seed/collections.ts",
+    "verify": "tsx seed/verify.ts",
+    "healthcheck": "tsx seed/healthcheck.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
