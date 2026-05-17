@@ -10,7 +10,7 @@ const COLLECTION_CREATE = `
 mutation CollectionCreate($input: CollectionInput!) {
   collectionCreate(input: $input) {
     collection { id handle title }
-    userErrors { field message code }
+    userErrors { field message }
   }
 }`;
 
