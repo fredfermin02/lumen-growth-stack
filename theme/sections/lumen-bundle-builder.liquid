@@ -1,0 +1,383 @@
+{%- liquid
+  assign s = section.settings
+  assign products = s.products.value | default: s.products
+-%}
+
+<lumen-bundle-builder
+  class="section color-{{ s.color_scheme }} spacing-style lumen-bundle"
+  id="bundle"
+  data-bundle-size="{{ s.bundle_size }}"
+  {% if s.discount_code != blank %}data-discount-code="{{ s.discount_code }}"{% endif %}
+  style="{% render 'spacing-style', settings: s %}"
+>
+  <div class="lumen-bundle__inner">
+    {%- if s.heading != blank -%}
+      <h2 class="lumen-bundle__heading">{{ s.heading }}</h2>
+    {%- endif -%}
+
+    {%- if s.subheading != blank -%}
+      <div class="lumen-bundle__subheading rte">{{ s.subheading }}</div>
+    {%- endif -%}
+
+    {%- if products.size > 0 -%}
+      <div class="lumen-bundle__progress" data-bundle-progress>
+        <div class="lumen-bundle__count">
+          <span data-bundle-count>0</span> of {{ s.bundle_size }} picked
+        </div>
+        <div class="lumen-bundle__bar" aria-hidden="true">
+          <div class="lumen-bundle__bar-fill" data-bundle-bar></div>
+        </div>
+      </div>
+
+      <ul class="lumen-bundle__grid" role="list">
+        {%- for product in products -%}
+          {%- liquid
+            assign single_variant = null
+            for v in product.variants
+              if v.options[0] contains 'Single'
+                assign single_variant = v
+                break
+              endif
+            endfor
+            if single_variant == null
+              assign single_variant = product.variants.first
+            endif
+          -%}
+          <li class="lumen-bundle__card" data-variant-id="{{ single_variant.id }}">
+            <div class="lumen-bundle__media">
+              {%- if product.featured_image -%}
+                {{
+                  product.featured_image
+                  | image_url: width: 600
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(min-width: 750px) 25vw, 50vw',
+                    widths: '300, 600',
+                    alt: product.featured_image.alt | default: product.title,
+                    class: 'lumen-bundle__image'
+                }}
+              {%- else -%}
+                <div class="lumen-bundle__image lumen-bundle__image--placeholder">
+                  {{- 'product-1' | placeholder_svg_tag: 'placeholder-svg' -}}
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="lumen-bundle__info">
+              <h3 class="lumen-bundle__title">{{ product.title }}</h3>
+              {%- if product.metafields.custom.flavor_notes -%}
+                <p class="lumen-bundle__notes">{{ product.metafields.custom.flavor_notes }}</p>
+              {%- endif -%}
+            </div>
+
+            <div class="lumen-bundle__controls">
+              <button type="button" class="lumen-bundle__btn lumen-bundle__btn--minus" data-bundle-decrement aria-label="Remove one {{ product.title }}">−</button>
+              <span class="lumen-bundle__qty" data-bundle-qty>0</span>
+              <button type="button" class="lumen-bundle__btn lumen-bundle__btn--plus" data-bundle-increment aria-label="Add one {{ product.title }}">+</button>
+            </div>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      <div class="lumen-bundle__actions">
+        <button type="button" class="button button-primary lumen-bundle__submit" data-bundle-submit disabled>
+          Add {{ s.bundle_size }} to cart
+        </button>
+        <p class="lumen-bundle__status" data-bundle-status></p>
+      </div>
+    {%- else -%}
+      <p class="lumen-bundle__empty">No products selected. Edit this section to pick the bundle components.</p>
+    {%- endif -%}
+  </div>
+</lumen-bundle-builder>
+
+<script src="{{ 'lumen-bundle-builder.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .lumen-bundle__inner {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+  }
+
+  .lumen-bundle__heading {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    margin: 0 0 0.75rem;
+    color: var(--color-foreground-heading);
+    text-align: center;
+  }
+
+  .lumen-bundle__subheading {
+    color: var(--color-foreground);
+    opacity: 0.85;
+    margin: 0 auto 2rem;
+    max-width: 36rem;
+    text-align: center;
+  }
+
+  .lumen-bundle__progress {
+    margin-bottom: 1.75rem;
+  }
+
+  .lumen-bundle__count {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-foreground-heading);
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .lumen-bundle__bar {
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 999px;
+    overflow: hidden;
+    max-width: 24rem;
+    margin: 0 auto;
+  }
+
+  .lumen-bundle__bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-primary);
+    transition: width 0.2s ease;
+  }
+
+  .lumen-bundle__grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 750px) {
+    .lumen-bundle__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  .lumen-bundle__card {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--color-background);
+    transition: border-color 0.15s ease;
+  }
+
+  .lumen-bundle__card[data-bundle-active='true'] {
+    border-color: var(--color-primary);
+  }
+
+  .lumen-bundle__media {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--color-border);
+  }
+
+  .lumen-bundle__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .lumen-bundle__image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lumen-bundle__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-foreground-heading);
+  }
+
+  .lumen-bundle__notes {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--color-foreground);
+    opacity: 0.75;
+    line-height: 1.4;
+  }
+
+  .lumen-bundle__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+
+  .lumen-bundle__btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    color: var(--color-foreground-heading);
+    font-size: 1.125rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+
+  .lumen-bundle__btn:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .lumen-bundle__btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .lumen-bundle__qty {
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 1.5rem;
+    text-align: center;
+    color: var(--color-foreground-heading);
+  }
+
+  .lumen-bundle__actions {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .lumen-bundle__submit {
+    min-width: 16rem;
+  }
+
+  .lumen-bundle__submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .lumen-bundle__status {
+    margin: 0.75rem 0 0;
+    min-height: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--color-foreground);
+  }
+
+  .lumen-bundle__status[data-status='error'] {
+    color: #b6593f;
+  }
+
+  .lumen-bundle__status[data-status='success'] {
+    color: #5c8c6e;
+  }
+
+  .lumen-bundle__empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-foreground);
+    opacity: 0.6;
+    font-style: italic;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lumen bundle builder",
+  "class": "lumen-section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Build your own 12-pack"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "<p>Mix any 12 cans. Use code <strong>BUILD12</strong> for 15% off.</p>"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Bundle products",
+      "info": "Pick the flavors customers can choose from. The first 'Single can' variant of each is used."
+    },
+    {
+      "type": "range",
+      "id": "bundle_size",
+      "label": "Bundle size (total cans)",
+      "min": 3,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "text",
+      "id": "discount_code",
+      "label": "Discount code (optional)",
+      "info": "If set, the cart redirects via /discount/<code>?redirect=/cart so the discount applies automatically."
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lumen bundle builder",
+      "category": "Lumen",
+      "settings": {
+        "heading": "Build your own 12-pack",
+        "bundle_size": 12,
+        "discount_code": "BUILD12"
+      }
+    }
+  ]
+}
+{% endschema %}
