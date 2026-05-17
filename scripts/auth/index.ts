@@ -25,6 +25,8 @@ const SCOPES = [
   "read_locations",
   "read_price_rules",
   "read_discounts",
+  "read_content",
+  "write_content",
 ].join(",");
 
 function exit(msg: string, code = 1): never {

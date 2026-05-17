@@ -1,0 +1,59 @@
+{
+  "sections": {
+    "hero": {
+      "type": "lumen-hero-fullbleed",
+      "settings": {
+        "eyebrow": "Festival edition",
+        "headline": "Made for the long weekend",
+        "subhead": "Functional beverages for the dance, the dust, and the morning after. Real ingredients. Festival-tested.",
+        "cta_label": "Build your pack",
+        "cta_link": "#bundle",
+        "height": "100svh",
+        "overlay_opacity": 50,
+        "text_alignment": "center",
+        "color_scheme": "scheme-2",
+        "audience_tag": "festival",
+        "swap_athletes_headline": "Show up sharp",
+        "swap_wellness_headline": "Find your calm"
+      }
+    },
+    "mission": {
+      "type": "lumen-mission",
+      "settings": {
+        "eyebrow": "1% for the planet",
+        "headline": "Festivals last a weekend. The packaging shouldn't.",
+        "body": "<p>Our cans are 70%+ post-consumer recycled aluminum. 1% of every sale goes to environmental nonprofits. Public quarterly reports.</p>",
+        "stat_1_number": "70%+",
+        "stat_1_label": "post-consumer aluminum",
+        "stat_2_number": "1%",
+        "stat_2_label": "to environmental nonprofits",
+        "stat_3_number": "100%",
+        "stat_3_label": "recyclable packaging",
+        "media_position": "left",
+        "section_width": "page-width",
+        "color_scheme": "scheme-1"
+      }
+    },
+    "testimonials": {
+      "type": "lumen-testimonial-grid",
+      "settings": {
+        "heading": "From the festival crowd",
+        "category_filter": "festival",
+        "columns_desktop": 2,
+        "columns_mobile": "1",
+        "color_scheme": "scheme-1"
+      }
+    },
+    "sticky": {
+      "type": "lumen-sticky-buy-bar",
+      "settings": {
+        "headline": "Build your festival pack",
+        "cta_label": "Shop bundles",
+        "cta_link": "shopify://collections/all",
+        "show_after_scroll_px": 800,
+        "color_scheme": "scheme-1"
+      }
+    }
+  },
+  "order": ["hero", "mission", "testimonials", "sticky"]
+}

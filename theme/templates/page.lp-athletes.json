@@ -1,0 +1,59 @@
+{
+  "sections": {
+    "hero": {
+      "type": "lumen-hero-split",
+      "settings": {
+        "eyebrow": "For athletes",
+        "headline": "Show up sharp",
+        "subhead": "L-theanine + lion's mane for steady focus. Cordyceps + B12 for the back half of long efforts. Real adaptogens. Real doses.",
+        "cta_label": "Shop Clarity + Ember",
+        "cta_link": "shopify://collections/focus-energy",
+        "media_position": "right",
+        "section_width": "full-width",
+        "color_scheme": "scheme-1",
+        "audience_tag": "athletes",
+        "swap_wellness_headline": "Find your calm",
+        "swap_festival_headline": "Made for the long days"
+      }
+    },
+    "compare": {
+      "type": "lumen-comparison-table",
+      "settings": {
+        "heading": "What's actually in your can",
+        "subheading": "<p>Pre-workouts are a marketing arms race. Lumen isn't.</p>",
+        "our_label": "Lumen",
+        "their_label": "Typical pre-workout",
+        "color_scheme": "scheme-1"
+      }
+    },
+    "testimonials": {
+      "type": "lumen-testimonial-grid",
+      "settings": {
+        "heading": "From the field",
+        "category_filter": "athletes",
+        "columns_desktop": 2,
+        "columns_mobile": "1",
+        "color_scheme": "scheme-1"
+      }
+    },
+    "faq": {
+      "type": "lumen-faq",
+      "settings": {
+        "heading": "Frequently asked",
+        "category_filter": "Ingredients",
+        "color_scheme": "scheme-1"
+      }
+    },
+    "sticky": {
+      "type": "lumen-sticky-buy-bar",
+      "settings": {
+        "headline": "Ember — for the back half",
+        "cta_label": "Shop Ember",
+        "cta_link": "/products/ember",
+        "show_after_scroll_px": 800,
+        "color_scheme": "scheme-1"
+      }
+    }
+  },
+  "order": ["hero", "compare", "testimonials", "faq", "sticky"]
+}

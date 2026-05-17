@@ -12,6 +12,7 @@
     "seed:content": "tsx seed/content.ts",
     "seed:collections": "tsx seed/collections.ts",
     "seed:publish": "tsx seed/publish.ts",
+    "seed:pages": "tsx seed/pages.ts",
     "verify": "tsx seed/verify.ts",
     "healthcheck": "tsx seed/healthcheck.ts"
   },

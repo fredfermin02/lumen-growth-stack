@@ -1,0 +1,66 @@
+{
+  "sections": {
+    "hero": {
+      "type": "lumen-hero-fullbleed",
+      "settings": {
+        "eyebrow": "Everyday wellness",
+        "headline": "Drink the difference",
+        "subhead": "Ashwagandha, reishi, lion's mane. Clinical doses, not marketing sprinkles.",
+        "cta_label": "Shop the line",
+        "cta_link": "shopify://collections/all",
+        "height": "80svh",
+        "overlay_opacity": 40,
+        "text_alignment": "left",
+        "color_scheme": "scheme-2",
+        "audience_tag": "wellness",
+        "swap_athletes_headline": "Built for the back half",
+        "swap_festival_headline": "For the long weekend"
+      }
+    },
+    "mission": {
+      "type": "lumen-mission",
+      "settings": {
+        "eyebrow": "Why we exist",
+        "headline": "Wellness without the marketing sprinkle",
+        "body": "<p>Real adaptogens. Real doses. Real transparency. We post lab results because we have nothing to hide.</p>",
+        "stat_1_number": "500mg+",
+        "stat_1_label": "clinical-grade adaptogen per can",
+        "stat_2_number": "1%",
+        "stat_2_label": "of every sale to the planet",
+        "stat_3_number": "ISO 17025",
+        "stat_3_label": "lab-tested every batch",
+        "media_position": "right",
+        "section_width": "page-width",
+        "color_scheme": "scheme-1"
+      }
+    },
+    "testimonials": {
+      "type": "lumen-testimonial-grid",
+      "settings": {
+        "heading": "From the daily ritual crowd",
+        "category_filter": "wellness",
+        "columns_desktop": 2,
+        "columns_mobile": "1",
+        "color_scheme": "scheme-1"
+      }
+    },
+    "faq": {
+      "type": "lumen-faq",
+      "settings": {
+        "heading": "Frequently asked",
+        "color_scheme": "scheme-1"
+      }
+    },
+    "sticky": {
+      "type": "lumen-sticky-buy-bar",
+      "settings": {
+        "headline": "Quiet — your 9pm ritual",
+        "cta_label": "Shop Quiet",
+        "cta_link": "/products/quiet",
+        "show_after_scroll_px": 800,
+        "color_scheme": "scheme-1"
+      }
+    }
+  },
+  "order": ["hero", "mission", "testimonials", "faq", "sticky"]
+}
