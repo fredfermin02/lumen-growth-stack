@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "auth": "tsx auth/index.ts",
     "seed": "tsx seed/index.ts",
     "seed:metafields": "tsx seed/metafields.ts",
     "seed:metaobjects": "tsx seed/metaobjects.ts",
