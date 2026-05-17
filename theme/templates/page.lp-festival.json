@@ -39,6 +39,12 @@
       "settings": {
         "heading": "Build your festival pack",
         "subheading": "<p>Mix any 12 cans across our four flavors. Use code <strong>BUILD12</strong> for 15% off.</p>",
+        "products": [
+          "shopify://products/clarity",
+          "shopify://products/quiet",
+          "shopify://products/bloom",
+          "shopify://products/ember"
+        ],
         "bundle_size": 12,
         "discount_code": "BUILD12",
         "color_scheme": "scheme-1"
@@ -48,6 +54,10 @@
       "type": "lumen-testimonial-grid",
       "settings": {
         "heading": "From the festival crowd",
+        "testimonials": [
+          "shopify://metaobjects/testimonial/jordan-l-quiet",
+          "shopify://metaobjects/testimonial/alex-f-ember"
+        ],
         "category_filter": "festival",
         "columns_desktop": 2,
         "columns_mobile": "1",

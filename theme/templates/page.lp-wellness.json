@@ -38,6 +38,10 @@
       "type": "lumen-testimonial-grid",
       "settings": {
         "heading": "From the daily ritual crowd",
+        "testimonials": [
+          "shopify://metaobjects/testimonial/priya-r-quiet",
+          "shopify://metaobjects/testimonial/dani-m-bloom"
+        ],
         "category_filter": "wellness",
         "columns_desktop": 2,
         "columns_mobile": "1",
@@ -48,6 +52,14 @@
       "type": "lumen-faq",
       "settings": {
         "heading": "Frequently asked",
+        "items": [
+          "shopify://metaobjects/faq_item/what-is-in-these",
+          "shopify://metaobjects/faq_item/is-caffeine-natural",
+          "shopify://metaobjects/faq_item/third-party-tested",
+          "shopify://metaobjects/faq_item/shipping-locations",
+          "shopify://metaobjects/faq_item/keeping-cold",
+          "shopify://metaobjects/faq_item/skip-delivery"
+        ],
         "color_scheme": "scheme-1"
       }
     },

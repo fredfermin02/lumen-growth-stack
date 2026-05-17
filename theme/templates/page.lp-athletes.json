@@ -21,6 +21,13 @@
       "settings": {
         "heading": "What's actually in your can",
         "subheading": "<p>Pre-workouts are a marketing arms race. Lumen isn't.</p>",
+        "points": [
+          "shopify://metaobjects/comparison_point/sugar-per-can",
+          "shopify://metaobjects/comparison_point/caffeine-source",
+          "shopify://metaobjects/comparison_point/functional-dose",
+          "shopify://metaobjects/comparison_point/third-party-testing",
+          "shopify://metaobjects/comparison_point/can-material"
+        ],
         "our_label": "Lumen",
         "their_label": "Typical pre-workout",
         "color_scheme": "scheme-1"
@@ -30,6 +37,10 @@
       "type": "lumen-testimonial-grid",
       "settings": {
         "heading": "From the field",
+        "testimonials": [
+          "shopify://metaobjects/testimonial/sarah-k-clarity",
+          "shopify://metaobjects/testimonial/marcus-t-ember"
+        ],
         "category_filter": "athletes",
         "columns_desktop": 2,
         "columns_mobile": "1",
@@ -40,6 +51,11 @@
       "type": "lumen-faq",
       "settings": {
         "heading": "Frequently asked",
+        "items": [
+          "shopify://metaobjects/faq_item/what-is-in-these",
+          "shopify://metaobjects/faq_item/is-caffeine-natural",
+          "shopify://metaobjects/faq_item/third-party-tested"
+        ],
         "category_filter": "Ingredients",
         "color_scheme": "scheme-1"
       }
