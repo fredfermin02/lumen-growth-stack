@@ -10,6 +10,7 @@
     "seed:products": "tsx seed/products.ts",
     "seed:inventory": "tsx seed/inventory.ts",
     "seed:collections": "tsx seed/collections.ts",
+    "seed:publish": "tsx seed/publish.ts",
     "verify": "tsx seed/verify.ts",
     "healthcheck": "tsx seed/healthcheck.ts"
   },
