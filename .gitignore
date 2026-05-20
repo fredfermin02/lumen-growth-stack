@@ -21,6 +21,11 @@ Thumbs.db
 .vscode/
 .idea/
 .claude/
+
+# Build artifacts
+dist/
+.aws-sam/
+samconfig.toml
 *.swp
 *.swo
 

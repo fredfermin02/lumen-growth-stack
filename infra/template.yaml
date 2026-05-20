@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lumen events pipeline — Lambda Function URL → S3 → Athena/Glue
+
+Parameters:
+  HmacSecretParamName:
+    Type: String
+    Default: /lumen/stape-hmac-secret
+    Description: Name of the SSM SecureString parameter holding the Stape HMAC secret (created out-of-band by aws-setup.sh).
+
+Resources:
+  EventsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub lumen-events-${AWS::AccountId}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireQueryResults
+            Prefix: athena-results/
+            Status: Enabled
+            ExpirationInDays: 7
+          - Id: AbortIncompleteMultipartUploads
+            Status: Enabled
+            AbortIncompleteMultipartUpload: { DaysAfterInitiation: 1 }
+
+  GlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: lumen_analytics
+        Description: Lumen Phase 3 raw events
+
+  GlueRawEventsTable:
+    Type: AWS::Glue::Table
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseName: !Ref GlueDatabase
+      TableInput:
+        Name: raw_events
+        TableType: EXTERNAL_TABLE
+        Parameters:
+          classification: json
+          projection.enabled: 'true'
+          projection.dt.type: date
+          projection.dt.range: '2026-01-01,NOW'
+          projection.dt.format: yyyy-MM-dd
+          storage.location.template: !Sub s3://lumen-events-${AWS::AccountId}/raw/dt=${!dt}/
+        PartitionKeys:
+          - { Name: dt, Type: string }
+        StorageDescriptor:
+          Location: !Sub s3://lumen-events-${AWS::AccountId}/raw/
+          InputFormat: org.apache.hadoop.mapred.TextInputFormat
+          OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+          SerdeInfo:
+            SerializationLibrary: org.openx.data.jsonserde.JsonSerDe
+            Parameters: { ignore.malformed.json: 'true' }
+          Columns:
+            - { Name: event_id, Type: string }
+            - { Name: event_name, Type: string }
+            - { Name: occurred_at, Type: timestamp }
+            - { Name: shop, Type: string }
+            - { Name: user_pseudo_id, Type: string }
+            - { Name: value, Type: double }
+            - { Name: currency, Type: string }
+            - { Name: payload, Type: string }
+
+  AthenaWorkgroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: lumen
+      State: ENABLED
+      WorkGroupConfiguration:
+        ResultConfiguration:
+          OutputLocation: !Sub s3://lumen-events-${AWS::AccountId}/athena-results/
+        BytesScannedCutoffPerQuery: 104857600
+        EnforceWorkGroupConfiguration: true
+        PublishCloudWatchMetricsEnabled: false
+
+  EventsWebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lumen-events-webhook
+      CodeUri: ../services/events-webhook/dist
+      Handler: handler.handler
+      Runtime: nodejs22.x
+      Timeout: 10
+      MemorySize: 256
+      Architectures: [arm64]
+      Environment:
+        Variables:
+          S3_BUCKET: !Sub lumen-events-${AWS::AccountId}
+          HMAC_SECRET_PARAM: !Ref HmacSecretParamName
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Sub lumen-events-${AWS::AccountId}
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "${HmacSecretParamName}"
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowMethods: [POST]
+          AllowOrigins: ['*']
+          AllowHeaders: [content-type, x-stape-signature, x-stape-timestamp]
+
+Outputs:
+  FunctionUrl:
+    Description: Public Lambda Function URL (HMAC-guarded)
+    Value: !GetAtt EventsWebhookFunctionUrl.FunctionUrl
+  BucketName:
+    Description: S3 bucket holding raw events + Athena results
+    Value: !Sub lumen-events-${AWS::AccountId}
+  GlueDatabase:
+    Value: !Ref GlueDatabase
+  AthenaWorkgroup:
+    Value: !Ref AthenaWorkgroup
