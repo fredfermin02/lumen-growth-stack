@@ -3,7 +3,7 @@ set -euo pipefail
 
 REGION="${AWS_REGION:-us-east-1}"
 STACK_NAME="lumen-events"
-HMAC_PARAM="/lumen/stape-hmac-secret"
+HMAC_PARAM="lumen-stape-hmac-secret"
 
 cd "$(dirname "$0")/.."
 
@@ -39,7 +39,7 @@ echo "→ Building Lambda bundle"
 
 # SAM build + deploy
 echo "→ sam build"
-sam build --template infra/template.yaml --base-dir .
+sam build --template infra/template.yaml
 
 echo "→ sam deploy"
 sam deploy \

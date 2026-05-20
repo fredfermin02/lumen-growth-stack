@@ -5,8 +5,8 @@ Description: Lumen events pipeline — Lambda Function URL → S3 → Athena/Glu
 Parameters:
   HmacSecretParamName:
     Type: String
-    Default: /lumen/stape-hmac-secret
-    Description: Name of the SSM SecureString parameter holding the Stape HMAC secret (created out-of-band by aws-setup.sh).
+    Default: lumen-stape-hmac-secret
+    Description: Name of the SSM SecureString parameter holding the Stape HMAC secret. Flat (no slashes) because SAM SSMParameterReadPolicy prepends 'parameter/' and SSM requires slashed names to start with a slash.
 
 Resources:
   EventsBucket:
@@ -91,7 +91,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: lumen-events-webhook
-      CodeUri: ../services/events-webhook/dist
+      CodeUri: ../services/events-webhook/dist/
       Handler: handler.handler
       Runtime: nodejs22.x
       Timeout: 10
