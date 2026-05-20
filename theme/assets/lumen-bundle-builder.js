@@ -99,6 +99,10 @@ class LumenBundleBuilder extends HTMLElement {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.description || `Add to cart failed (${res.status})`);
       }
+      document.dispatchEvent(new CustomEvent('cart:update', {
+        bubbles: true,
+        detail: { source: 'lumen-bundle-builder', itemCount: items.length },
+      }));
       this.#setStatus('Bundle added — redirecting…', 'success');
       const next = this.#discountCode
         ? `/discount/${encodeURIComponent(this.#discountCode)}?redirect=/cart`
