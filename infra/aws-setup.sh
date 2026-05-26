@@ -3,7 +3,7 @@ set -euo pipefail
 
 REGION="${AWS_REGION:-us-east-1}"
 STACK_NAME="lumen-events"
-HMAC_PARAM="lumen-stape-hmac-secret"
+BEARER_TOKEN_PARAM="lumen-stape-bearer-token"
 
 cd "$(dirname "$0")/.."
 
@@ -15,21 +15,21 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 echo "→ Deploying to account ${ACCOUNT_ID} / region ${REGION}"
 
 # Create SSM SecureString param if missing (SAM can't create SecureString)
-if aws ssm get-parameter --name "${HMAC_PARAM}" --region "${REGION}" >/dev/null 2>&1; then
-  echo "  ✓ ${HMAC_PARAM} already exists, skipping create"
+if aws ssm get-parameter --name "${BEARER_TOKEN_PARAM}" --region "${REGION}" >/dev/null 2>&1; then
+  echo "  ✓ ${BEARER_TOKEN_PARAM} already exists, skipping create"
 else
-  SECRET=$(openssl rand -hex 32)
+  TOKEN=$(openssl rand -hex 32)
   aws ssm put-parameter \
-    --name "${HMAC_PARAM}" \
+    --name "${BEARER_TOKEN_PARAM}" \
     --type SecureString \
-    --value "${SECRET}" \
+    --value "${TOKEN}" \
     --region "${REGION}" \
-    --description "Stape HMAC shared secret for events-webhook Lambda" \
+    --description "Bearer token Stape sends in the Authorization header to events-webhook Lambda" \
     >/dev/null
-  echo "  ✓ ${HMAC_PARAM} created"
+  echo "  ✓ ${BEARER_TOKEN_PARAM} created"
   echo ""
-  echo "  📋 COPY THIS HMAC SECRET INTO STAPE NOW (only shown once):"
-  echo "     ${SECRET}"
+  echo "  📋 COPY THIS BEARER TOKEN INTO STAPE NOW (only shown once):"
+  echo "     ${TOKEN}"
   echo ""
 fi
 
@@ -48,7 +48,7 @@ sam deploy \
   --region "${REGION}" \
   --capabilities CAPABILITY_IAM \
   --resolve-s3 \
-  --parameter-overrides "HmacSecretParamName=${HMAC_PARAM}" \
+  --parameter-overrides "BearerTokenParamName=${BEARER_TOKEN_PARAM}" \
   --no-confirm-changeset \
   --no-fail-on-empty-changeset
 
@@ -101,7 +101,7 @@ echo "  Athena workgroup:    lumen"
 echo "  Athena database:     lumen_analytics"
 echo ""
 echo "  Next:"
-echo "    1. Paste the Function URL into Stape's HTTP Request Tag"
-echo "    2. Paste the HMAC secret (printed above) into Stape's HMAC variable"
+echo "    1. Paste the Function URL into Stape's JSON HTTP Request Tag"
+echo "    2. Add header 'Authorization: Bearer <token>' using the value printed above"
 echo "    3. Smoke test via: scripts/test-webhook.sh"
 echo "═══════════════════════════════════════════════════════════════"

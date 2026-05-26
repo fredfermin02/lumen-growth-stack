@@ -3,10 +3,10 @@ Transform: AWS::Serverless-2016-10-31
 Description: Lumen events pipeline — Lambda Function URL → S3 → Athena/Glue
 
 Parameters:
-  HmacSecretParamName:
+  BearerTokenParamName:
     Type: String
-    Default: lumen-stape-hmac-secret
-    Description: Name of the SSM SecureString parameter holding the Stape HMAC secret. Flat (no slashes) because SAM SSMParameterReadPolicy prepends 'parameter/' and SSM requires slashed names to start with a slash.
+    Default: lumen-stape-bearer-token
+    Description: Name of the SSM SecureString parameter holding the bearer token Stape sends in the Authorization header. Flat (no slashes) because SAM SSMParameterReadPolicy prepends 'parameter/' and SSM requires slashed names to start with a slash.
 
 Resources:
   EventsBucket:
@@ -100,22 +100,22 @@ Resources:
       Environment:
         Variables:
           S3_BUCKET: !Sub lumen-events-${AWS::AccountId}
-          HMAC_SECRET_PARAM: !Ref HmacSecretParamName
+          BEARER_TOKEN_PARAM: !Ref BearerTokenParamName
       Policies:
         - S3WritePolicy:
             BucketName: !Sub lumen-events-${AWS::AccountId}
         - SSMParameterReadPolicy:
-            ParameterName: !Sub "${HmacSecretParamName}"
+            ParameterName: !Sub "${BearerTokenParamName}"
       FunctionUrlConfig:
         AuthType: NONE
         Cors:
           AllowMethods: [POST]
           AllowOrigins: ['*']
-          AllowHeaders: [content-type, x-stape-signature, x-stape-timestamp]
+          AllowHeaders: [content-type, authorization]
 
 Outputs:
   FunctionUrl:
-    Description: Public Lambda Function URL (HMAC-guarded)
+    Description: Public Lambda Function URL (bearer-token-guarded)
     Value: !GetAtt EventsWebhookFunctionUrl.FunctionUrl
   BucketName:
     Description: S3 bucket holding raw events + Athena results

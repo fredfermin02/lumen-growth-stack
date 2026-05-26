@@ -2,18 +2,18 @@ import { randomUUID } from "node:crypto";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { GetParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 import type { LambdaFunctionURLEvent, LambdaFunctionURLResult } from "aws-lambda";
-import { verifyHmac } from "./hmac.ts";
+import { verifyBearer } from "./auth.ts";
 import { eventSchema, partitionDate, toRawEventRow } from "./schema.ts";
 
 const REGION = process.env.AWS_REGION ?? "us-east-1";
 const S3_BUCKET = required("S3_BUCKET");
-const HMAC_SECRET_PARAM = required("HMAC_SECRET_PARAM");
+const BEARER_TOKEN_PARAM = required("BEARER_TOKEN_PARAM");
 
 const s3 = new S3Client({ region: REGION });
 const ssm = new SSMClient({ region: REGION });
 
-let secretCache: { value: string; fetchedAt: number } | null = null;
-const SECRET_TTL_MS = 5 * 60 * 1000;
+let tokenCache: { value: string; fetchedAt: number } | null = null;
+const TOKEN_TTL_MS = 5 * 60 * 1000;
 
 function required(name: string): string {
   const v = process.env[name];
@@ -21,19 +21,19 @@ function required(name: string): string {
   return v;
 }
 
-async function getHmacSecret(): Promise<string> {
-  const override = process.env.HMAC_SECRET_LOCAL;
+async function getBearerToken(): Promise<string> {
+  const override = process.env.BEARER_TOKEN_LOCAL;
   if (override) return override;
 
-  if (secretCache && Date.now() - secretCache.fetchedAt < SECRET_TTL_MS) {
-    return secretCache.value;
+  if (tokenCache && Date.now() - tokenCache.fetchedAt < TOKEN_TTL_MS) {
+    return tokenCache.value;
   }
   const res = await ssm.send(
-    new GetParameterCommand({ Name: HMAC_SECRET_PARAM, WithDecryption: true }),
+    new GetParameterCommand({ Name: BEARER_TOKEN_PARAM, WithDecryption: true }),
   );
   const value = res.Parameter?.Value;
-  if (!value) throw new Error(`SSM parameter ${HMAC_SECRET_PARAM} is empty`);
-  secretCache = { value, fetchedAt: Date.now() };
+  if (!value) throw new Error(`SSM parameter ${BEARER_TOKEN_PARAM} is empty`);
+  tokenCache = { value, fetchedAt: Date.now() };
   return value;
 }
 
@@ -57,26 +57,22 @@ export async function handler(
     : event.body ?? "";
 
   const headers = lowercaseHeaders(event.headers ?? {});
-  const signature = headers["x-stape-signature"];
-  const timestamp = headers["x-stape-timestamp"];
 
-  let secret: string;
+  let expectedToken: string;
   try {
-    secret = await getHmacSecret();
+    expectedToken = await getBearerToken();
   } catch (err) {
     console.error("ssm_fetch_failed", err);
-    return respond(500, { ok: false, reason: "secret_unavailable" });
+    return respond(500, { ok: false, reason: "token_unavailable" });
   }
 
-  const hmacResult = verifyHmac({
-    signatureHeader: signature,
-    timestampHeader: timestamp,
-    body: rawBody,
-    secret,
+  const authResult = verifyBearer({
+    authorizationHeader: headers["authorization"],
+    expected: expectedToken,
   });
 
-  if (!hmacResult.ok) {
-    return respond(401, { ok: false, reason: hmacResult.reason });
+  if (!authResult.ok) {
+    return respond(401, { ok: false, reason: authResult.reason });
   }
 
   let parsed: unknown;
