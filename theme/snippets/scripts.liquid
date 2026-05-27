@@ -257,6 +257,16 @@
 {% endif %}
 
 {% if template == 'product' or template.name == 'product' or request.page_type == 'product' %}
+  {%- comment -%}
+    Variant assignment for experiment 001 (subscription-default-on).
+    Loaded with `fetchpriority="high"` and without `defer` so the assignment
+    cookie is written before the Custom Pixel's product_viewed handler reads it.
+  {%- endcomment -%}
+  <script
+    src="{{ 'lumen-experiment.js' | asset_url }}"
+    type="module"
+    fetchpriority="high"
+  ></script>
   <script
     src="{{ 'fly-to-cart.js' | asset_url }}"
     type="module"
