@@ -38,7 +38,7 @@ Plus: **URL-driven content personalization**. A Facebook ad targeting athletes c
 
 Modern tracking pipeline: every important customer event (product view, add-to-cart, checkout, purchase) flows through a server we control before being forwarded to Google Analytics and our own data warehouse, all with matching IDs so we can verify everything lines up.
 
-### Phase 4 · Experimentation with rigor 🚧 *in progress*
+### Phase 4 · Experimentation with rigor ✅
 
 > *How do we know our changes are working  not just feel like they are?*
 
@@ -63,7 +63,7 @@ All data sources  store orders, web events, ad spend  flow into one warehouse. D
 | 1 | Storefront foundation | ✅ Shipped |
 | 2 | Landing page system + URL personalization | ✅ Shipped |
 | 3 | Server-side event tracking | ✅ Shipped |
-| 4 | A/B testing framework | 🚧 In progress |
+| 4 | A/B testing framework | ✅ Shipped |
 | 5 | Warehouse + dbt + dashboards | ⏳ Planned |
 | 6 | README polish + walkthrough video | ⏳ Planned |
 
