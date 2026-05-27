@@ -32,17 +32,21 @@ Plus: **URL-driven content personalization**. A Facebook ad targeting athletes c
 
 **Signal:** Builds tools, not just features. Marketers get autonomy; engineering doesn't become a bottleneck.
 
-### Phase 3 · Server-side measurement 🚧 *in progress*
+### Phase 3 · Server-side measurement ✅
 
 > *Do we actually know what's converting?*
 
-Modern tracking pipeline: every important customer event (product view, add-to-cart, checkout, purchase) flows through a server we control before being forwarded to Google Analytics, Meta (Facebook), and our own data warehouse all with matching IDs so we can verify everything lines up.
+Modern tracking pipeline: every important customer event (product view, add-to-cart, checkout, purchase) flows through a server we control before being forwarded to Google Analytics and our own data warehouse, all with matching IDs so we can verify everything lines up.
 
-### Phase 4 · Experimentation with rigor ⏳
+### Phase 4 · Experimentation with rigor 🚧 *in progress*
 
 > *How do we know our changes are working  not just feel like they are?*
 
-A/B testing framework with a real hypothesis, sample-size math, and a pre-registered analysis plan. One real test on the product page: defaulting subscription to ON vs. one-time-purchase ON.
+A/B testing framework with a real hypothesis, sample-size math, and a pre-registered analysis plan. One test on the product page: defaulting subscription to ON vs. one-time-purchase ON.
+
+- [Methodology](experiments.md)
+- [Experiment 001 pre-registration](experiments/001-subscription-default-on/preregistration.md)
+- [Experiment 001 results](experiments/001-subscription-default-on/results.md)
 
 ### Phase 5 · Unified analytics layer ⏳
 
@@ -58,8 +62,8 @@ All data sources  store orders, web events, ad spend  flow into one warehouse. D
 |---|---|---|
 | 1 | Storefront foundation | ✅ Shipped |
 | 2 | Landing page system + URL personalization | ✅ Shipped |
-| 3 | Server-side event tracking | 🚧 In progress |
-| 4 | A/B testing framework | ⏳ Planned |
+| 3 | Server-side event tracking | ✅ Shipped |
+| 4 | A/B testing framework | 🚧 In progress |
 | 5 | Warehouse + dbt + dashboards | ⏳ Planned |
 | 6 | README polish + walkthrough video | ⏳ Planned |
 
