@@ -1,0 +1,137 @@
+{% comment %}
+  Lumen subscription selector — Phase 4 A/B test scaffolding.
+
+  This is a fake/mock subscription radio used by experiment 001
+  (subscription-default-on). It exists so the PDP has the visual control
+  the test is varying. It does NOT attach a real Shopify selling plan to
+  the cart line — that would require a `sellingPlanGroupCreate` mutation
+  and the `write_products` scope.
+
+  What it does:
+  - Renders two radios in a fieldset.
+  - Marks one as `[data-subscription-radio="treatment"]` so the variant
+    assignment JS can pre-check it for users in the treatment arm.
+  - On change, writes `lumen_is_sub` cookie so the pixel sandbox can read
+    it and stamp `data.is_subscription` on every outgoing event.
+
+  Why the radio is fake is documented in `experiments.md` (root of repo).
+{% endcomment %}
+
+<fieldset
+  class="lumen-subscription-selector spacing-style"
+  data-subscription-selector
+  aria-labelledby="lumen-sub-legend"
+>
+  <legend
+    id="lumen-sub-legend"
+    class="lumen-subscription-selector__legend"
+  >
+    Purchase options
+  </legend>
+
+  <label class="lumen-subscription-selector__option">
+    <input
+      type="radio"
+      name="lumen_purchase_option"
+      value="one_time"
+      data-subscription-radio="control"
+      checked
+    >
+    <span class="lumen-subscription-selector__option-label">
+      <span class="lumen-subscription-selector__option-title">One-time purchase</span>
+    </span>
+  </label>
+
+  <label class="lumen-subscription-selector__option">
+    <input
+      type="radio"
+      name="lumen_purchase_option"
+      value="subscribe"
+      data-subscription-radio="treatment"
+    >
+    <span class="lumen-subscription-selector__option-label">
+      <span class="lumen-subscription-selector__option-title">Subscribe & save</span>
+      <span class="lumen-subscription-selector__option-badge">Save 15%</span>
+    </span>
+    <span class="lumen-subscription-selector__option-meta">
+      Delivered every 4 weeks. Cancel anytime.
+    </span>
+  </label>
+</fieldset>
+
+<style>
+  .lumen-subscription-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .lumen-subscription-selector__legend {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    padding: 0;
+  }
+
+  .lumen-subscription-selector__option {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 0.75rem;
+    align-items: start;
+    padding: 0.875rem 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+
+  .lumen-subscription-selector__option:hover {
+    border-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .lumen-subscription-selector__option:has(input:checked) {
+    border-color: currentColor;
+    border-width: 2px;
+    padding: calc(0.875rem - 1px) calc(1rem - 1px);
+  }
+
+  .lumen-subscription-selector__option input[type='radio'] {
+    margin-top: 0.2rem;
+  }
+
+  .lumen-subscription-selector__option-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .lumen-subscription-selector__option-title {
+    font-weight: 500;
+  }
+
+  .lumen-subscription-selector__option-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  .lumen-subscription-selector__option-meta {
+    grid-column: 2;
+    font-size: 0.8125rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+  }
+</style>
+
+<script
+  src="{{ 'lumen-subscription-radio.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>

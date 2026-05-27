@@ -217,6 +217,9 @@
               </div>
             </volume-pricing>
           {%- endif -%}
+
+          {%- render 'lumen-subscription-selector' -%}
+
           {% content_for 'block',
             type: 'add-to-cart',
             id: 'add-to-cart',
