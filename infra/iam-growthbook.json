@@ -1,0 +1,68 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AthenaQueryOnLumenWorkgroup",
+      "Effect": "Allow",
+      "Action": [
+        "athena:GetWorkGroup",
+        "athena:StartQueryExecution",
+        "athena:StopQueryExecution",
+        "athena:GetQueryExecution",
+        "athena:GetQueryResults",
+        "athena:GetQueryResultsStream",
+        "athena:ListQueryExecutions"
+      ],
+      "Resource": [
+        "arn:aws:athena:us-east-1:481180369246:workgroup/lumen"
+      ]
+    },
+    {
+      "Sid": "GlueReadCatalogForLumenAnalytics",
+      "Effect": "Allow",
+      "Action": [
+        "glue:GetDatabase",
+        "glue:GetDatabases",
+        "glue:GetTable",
+        "glue:GetTables",
+        "glue:GetPartition",
+        "glue:GetPartitions"
+      ],
+      "Resource": [
+        "arn:aws:glue:us-east-1:481180369246:catalog",
+        "arn:aws:glue:us-east-1:481180369246:database/lumen_analytics",
+        "arn:aws:glue:us-east-1:481180369246:table/lumen_analytics/*"
+      ]
+    },
+    {
+      "Sid": "S3ReadRawEvents",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": [
+        "arn:aws:s3:::lumen-events-481180369246",
+        "arn:aws:s3:::lumen-events-481180369246/raw/*"
+      ]
+    },
+    {
+      "Sid": "S3WriteAthenaResults",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListBucket",
+        "s3:ListMultipartUploadParts",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": [
+        "arn:aws:s3:::lumen-events-481180369246",
+        "arn:aws:s3:::lumen-events-481180369246/athena-results/*"
+      ]
+    }
+  ]
+}

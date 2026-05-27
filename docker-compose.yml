@@ -1,0 +1,61 @@
+# GrowthBook self-hosted for Phase 4 experimentation work.
+#
+# Usage:
+#   docker-compose up -d
+#   open http://localhost:3000          # GrowthBook UI
+#   open http://localhost:3100/healthcheck   # GrowthBook API
+#
+# Stack:
+#   - growthbook/growthbook    NextJS UI + ExpressJS API + Python stats engine
+#   - mongo:7                  Auth, experiment metadata, cached results
+#
+# The encryption/JWT secrets below are LOCAL-DEV-ONLY. Rotate before any
+# real deploy. MongoDB credentials are equally local-only.
+#
+# Connect Athena as a data source from the GrowthBook UI:
+#   Settings → Datasources → Add → Athena
+#   Region: us-east-1
+#   Workgroup: lumen
+#   Default catalog: AwsDataCatalog
+#   Default database: lumen_analytics
+#   S3 results URL: s3://lumen-events-481180369246/athena-results/
+#   IAM credentials: see infra/iam-growthbook.json
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: lumen-growthbook-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: growthbook
+      MONGO_INITDB_ROOT_PASSWORD: local-dev-only-change-me
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  growthbook:
+    image: growthbook/growthbook:latest
+    container_name: lumen-growthbook
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "3100:3100"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: "mongodb://growthbook:local-dev-only-change-me@mongo:27017/growthbook?authSource=admin"
+      APP_ORIGIN: "http://localhost:3000"
+      API_HOST: "http://localhost:3100"
+      JWT_SECRET: "lumen-local-dev-jwt-secret-do-not-use-in-prod-1234567890abcdef"
+      ENCRYPTION_KEY: "lumen-local-dev-enc-key-do-not-use-in-prod-1234567890ab"
+
+volumes:
+  mongo-data:
